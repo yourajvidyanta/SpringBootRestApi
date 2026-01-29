@@ -15,7 +15,6 @@ public class StudentController {
                 this.studentRepo = studentRepo;
         }
 
-
         @GetMapping("/student")
         public List<Student> getStudent(){
         return studentRepo.findAll();
