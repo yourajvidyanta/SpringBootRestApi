@@ -1,5 +1,6 @@
 package com.restapi.RestApi.Service.Impl;
 
+import com.restapi.RestApi.Dto.AddStudentRequestDto;
 import com.restapi.RestApi.Dto.StudentDto;
 import com.restapi.RestApi.Entity.Student;
 import com.restapi.RestApi.Reposetory.StudentRepo;
@@ -25,7 +26,6 @@ public class StudentServiceImplementation implements StudentService {
         List<StudentDto> studentDtoList = students.stream()
                 .map(student -> modelMapper.map(student,StudentDto.class))
                 .collect(Collectors.toList());
-
         return studentDtoList;
     }
 
@@ -34,4 +34,41 @@ public class StudentServiceImplementation implements StudentService {
          Student student= studentRepo.findById(id).orElseThrow(()-> new IllegalArgumentException("Student Not Found With id"));
          return modelMapper.map(student,StudentDto.class);
     }
+
+    @Override
+    public StudentDto createStudent(AddStudentRequestDto addStudentRequestDto) {
+        Student newStudent=modelMapper.map(addStudentRequestDto,Student.class);
+        Student student=studentRepo.save(newStudent);
+
+        return modelMapper.map(student,StudentDto.class);
+    }
+
+    @Override
+    public void deleteStudentById(Long id) {
+        if (!studentRepo.existsById(id)) {
+            throw new IllegalArgumentException("Student does not exist with id: " + id);
+        }
+        studentRepo.deleteById(id);
+    }
+
+    @Override
+    public StudentDto updateStudent(Long id, AddStudentRequestDto addStudentRequestDto) {
+
+        Student student = studentRepo.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Student not found with ID: " + id)
+                );
+
+        // map request → entity
+        modelMapper.map(addStudentRequestDto, student);
+
+        // save entity
+        student = studentRepo.save(student);
+
+        // map entity → DTO
+        return modelMapper.map(student, StudentDto.class);
+    }
+
+
+
 }

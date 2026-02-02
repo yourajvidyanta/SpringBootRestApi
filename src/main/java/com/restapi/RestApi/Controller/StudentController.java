@@ -1,11 +1,12 @@
 package com.restapi.RestApi.Controller;
 
+import com.restapi.RestApi.Dto.AddStudentRequestDto;
 import com.restapi.RestApi.Dto.StudentDto;
 import com.restapi.RestApi.Service.StudentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,8 +17,8 @@ public class StudentController {
         private final StudentService studentService;
 
         @GetMapping("/students")
-        public List<StudentDto> getStudent() {
-                return studentService.getAllStudent();
+        public ResponseEntity<List<StudentDto>> getStudent() {
+                return ResponseEntity.ok(studentService.getAllStudent());
         }
 
         @GetMapping("/get")
@@ -26,9 +27,27 @@ public class StudentController {
         }
 
         @GetMapping("students/{id}")
-        public StudentDto getStudentById(@PathVariable Long id) {
-                return studentService.getStudentById(id);
+        public  ResponseEntity<StudentDto> getStudentById(@PathVariable Long id) {
+                return ResponseEntity.ok(studentService.getStudentById(id));
         }
 
+        @PostMapping("/students")
+        public ResponseEntity<StudentDto>createNewStudent(@RequestBody AddStudentRequestDto addStudentRequestDto){
+                return ResponseEntity.status(HttpStatus.CREATED).body(studentService.createStudent(addStudentRequestDto));
+        }
 
+        @DeleteMapping("students/{id}")
+        public ResponseEntity<StudentDto>deleteStudent(@PathVariable Long id){
+                studentService.deleteStudentById(id);
+                return  ResponseEntity.noContent().build();
+        }
+
+        @PutMapping("/students/{id}")
+        public ResponseEntity<StudentDto> updateStudent(
+                @PathVariable Long id,
+                @RequestBody AddStudentRequestDto addStudentRequestDto) {
+
+                StudentDto updatedStudent = studentService.updateStudent(id, addStudentRequestDto);
+                return ResponseEntity.ok(updatedStudent);
+        }
 }
